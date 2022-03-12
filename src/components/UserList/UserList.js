@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Text from "components/Text";
 import Spinner from "components/Spinner";
 import CheckBox from "components/CheckBox";
@@ -6,32 +6,76 @@ import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import * as S from "./style";
 
-const UserList = ({ users, isLoading }) => {
-  const [hoveredUserId, setHoveredUserId] = useState();
 
+
+
+
+
+const UserList = ({ users, isLoading }) => {
+  
+  const [checkedCountryList, setCheckedCountrys] = useState([]);
+  // 
+  function onCheckboxChange(val, checked){
+    if (checked)
+      {
+
+      
+      checkedCountryList.push(val)
+      setCheckedCountrys(checkedCountryList)
+      }
+    else{
+
+      const filteredList = checkedCountryList.filter((country) =>country !== val)
+      setCheckedCountrys(filteredList)
+    }
+      
+    
+
+
+  }  
+  
+  const [hoveredUserId, setHoveredUserId] = useState();
+  
   const handleMouseEnter = (index) => {
     setHoveredUserId(index);
+    
+    
   };
 
   const handleMouseLeave = () => {
     setHoveredUserId();
   };
 
+
+
   return (
     <S.UserList>
       <S.Filters>
-        <CheckBox value="BR" label="Brazil" />
-        <CheckBox value="AU" label="Australia" />
-        <CheckBox value="CA" label="Canada" />
-        <CheckBox value="DE" label="Germany" />
+        <CheckBox value="BR" label="Brazil"  onChange={onCheckboxChange}
+                                                            isChecked={!!checkedCountryList.find((country)=> country === "BR")}/>
+        <CheckBox value="AU" label="Australia" onChange={onCheckboxChange}
+          isChecked={!!checkedCountryList.find((country)=> country === "AU")}/>
+        <CheckBox value="CA" label="Canada"  onChange={onCheckboxChange}
+          isChecked={!!checkedCountryList.find((country)=> country === "CA")}/>
+        <CheckBox value="DE" label="Germany" onChange={onCheckboxChange}
+          isChecked={!!checkedCountryList.find((country)=> country === "DE")}/>
       </S.Filters>
-      <S.List>
-        {users.map((user, index) => {
+      <S.List> 
+        {users.filter((user)=> {
+          if(checkedCountryList.length === 0){
+            return true;
+          }
+          
+          return !!checkedCountryList.find((country)=> country ===user.nat)
+        }).map((user, index) => {
+              console.log(user)
           return (
+            
             <S.User
               key={index}
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}
+              
             >
               <S.UserPicture src={user?.picture.large} alt="" />
               <S.UserInfo>
